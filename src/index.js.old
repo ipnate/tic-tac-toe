@@ -1,0 +1,109 @@
+
+
+let _cells;
+let _statusDisplay;
+let _resetButton;
+let _active;
+let _currentPlayer;
+let _state;
+
+const _winningConditions = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+];
+
+export const initiateGame = (doc) => {
+  _cells = doc.querySelectorAll('.cell');
+  _statusDisplay = doc.querySelector('.status');
+  _resetButton = doc.querySelector('.reset');
+
+  _cells.forEach(cell => cell.addEventListener('click', onClick));
+  _resetButton.addEventListener('click', reset);
+  _statusDisplay.innerHTML = _currentPlayerDisplayString();
+
+  _active = true;
+  _currentPlayer = "X";
+  _state = ["", "", "", "", "", "", "", "", ""];
+}
+
+const _currentPlayerDisplayString = () => `It's player ${_currentPlayer}'s turn`;
+
+export const onClick = (clickedCellEvent) => {
+    const clickedCell = clickedCellEvent.target;
+    const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+    
+    if (!_active || _state[clickedCellIndex] !== "") {
+      return;
+    }
+    
+    processClick(clickedCell, clickedCellIndex);
+    checkResult();
+    switchPlayer();
+}
+
+export const checkResult = () => {
+  console.log("checkResult");
+  console.log(_state);
+  let roundWon = false;
+  for (let i = 0; i <= 7; i++) {
+    const winCondition = _winningConditions[i];
+    const a = _state[winCondition[0]];
+    const b = _state[winCondition[1]];
+    const c = _state[winCondition[2]];
+    if (a === '' || b === '' || c === '') {
+      continue;
+    }
+    if (a === b && b === c) {
+      roundWon = true;
+      break
+    }
+  }
+  
+  if (roundWon) {
+    _statusDisplay.innerHTML = `Player ${_currentPlayer} has won!`;
+    _statusDisplay.classList.add('player-won');
+    _active = false;
+    return;
+  }
+
+  let roundDraw = !_state.includes("");
+  if (roundDraw) {
+    _statusDisplay.innerHTML = "It's a draw!";
+    _statusDisplay.classList.add('player-draw');
+    _active = false;
+    return;
+  }
+}
+
+export const processClick = (clickedCell, clickedCellIndex) => {
+  if (!_active) {
+    return;
+  }
+  _state[clickedCellIndex] = _currentPlayer;
+  clickedCell.innerHTML = _currentPlayer;
+
+}
+
+export const switchPlayer = () => {
+  if (!_active) {
+    return;
+  }
+  _currentPlayer = _currentPlayer === "X" ? "O" : "X";
+  _statusDisplay.innerHTML = _currentPlayerDisplayString();
+}
+
+export const reset = () => {
+  _active = true;
+  _currentPlayer = "X";
+  _state = ["", "", "", "", "", "", "", "", ""];
+  _statusDisplay.innerHTML = _currentPlayerDisplayString();
+  _statusDisplay.classList.remove('player-won');
+  _statusDisplay.classList.remove('player-draw');
+  _cells.forEach(cell => cell.innerHTML = "");
+};

@@ -1,0 +1,18 @@
+{
+  "name": "tic-tac-toe",
+  "version": "1.0.0",
+  "description": "Tic Tac Toe Game",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "http-server -c-1 -o -a localhost -p 8000",
+    "test": "vitest"
+  },
+  "author": "Ignatius (Nate) Du Preez",
+  "license": "ISC",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "jsdom": "^24.0.0",
+    "vitest": "0.34.6"
+  }
+}
