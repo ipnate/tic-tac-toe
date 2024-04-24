@@ -24,8 +24,6 @@ jobs:
         with:
           node-version: '16.20.2' 
       - run: npm install -g pnpm@8
-      - name: Install Playwright dependencies
-        run: sudo apt-get install -y libwoff1 libopus0 libwebp6 libwebpdemux2 libenchant1c2a libgudev-1.0-0 libsecret-1-0 libhyphen0 libgdk-pixbuf2.0-0 libegl1 libnotify4 libxslt1.1 libevent-2.1-6 libgles2 libvpx5
       - name: Create pnpm store directory
         run: mkdir -p ~/.pnpm-store
       - name: Cache dependencies 

@@ -8,7 +8,7 @@
     "start": "webpack serve",
     "build": "webpack",
     "test:vi:run": "vitest run Game.test.js",
-    "test:pw:prepare": "playwright install", 
+    "test:pw:prepare": "playwright install --with-deps", 
     "test:pw:run": "playwright test --project",
     "test:pw:run:all": "playwright test --project all",
     "test:pw:run:ch": "playwright test --project chromium",
