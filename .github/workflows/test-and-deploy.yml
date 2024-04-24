@@ -50,7 +50,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16.20.2' 
-      - run: npm install -g pnpm
+      - run: npm install -g pnpm@8
       - name: Create pnpm store directory
         run: mkdir -p ~/.pnpm-store
       - name: Cache dependencies
@@ -124,13 +124,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  cleanup-if-failure:
-    needs: [unit-tests, end-to-end-tests]
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Delete github-pages artifact
-        run: |
-          artifact_id=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/artifacts | jq '.artifacts[] | select(.name=="github-pages") | .id')
-          curl -X DELETE -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id
