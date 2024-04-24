@@ -11,8 +11,13 @@
   "author": "Ignatius (Nate) Du Preez",
   "license": "ISC",
   "devDependencies": {
-    "http-server": "^14.1.1",
+    "css-loader": "^7.1.1",
+    "html-webpack-plugin": "^5.6.0",
     "jsdom": "^24.0.0",
-    "vitest": "0.34.6"
+    "style-loader": "^4.0.0",
+    "vitest": "0.34.6",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
   }
 }

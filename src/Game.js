@@ -1,11 +1,8 @@
 class Game {
-  constructor(doc, initialPlayer = "X", initialState = ["", "", "", "", "", "", "", "", ""]) {
-    this._resetButton = doc.querySelector('.reset');
-    this._cells = Array.from(doc.querySelectorAll('.cell'));
-    this._statusDisplay = doc.querySelector('.status');
+  constructor() {
     this._active = true;
-    this._currentPlayer = initialPlayer;
-    this._state = initialState
+    this._currentPlayer = "X";
+    this._state = ["", "", "", "", "", "", "", "", ""];
     this._winningConditions = [
       [0, 1, 2],
       [3, 4, 5],
@@ -18,37 +15,23 @@ class Game {
     ];
   }
 
-  initiateGame() {
-    this._cells.forEach(cell => cell.innerHTML = this._state[cell.getAttribute('data-index')]);
-    this._cells.forEach(cell => cell.addEventListener('click', this.onClick.bind(this)));
-    this._resetButton.addEventListener('click', this.reset.bind(this));
-    this._statusDisplay.innerHTML = this.#currentPlayerDisplayString();
+  getCurrentPlayer() {
+    return this._currentPlayer;
   }
 
-  getGameStatus() {
+  getState() {
+    return this._state;
+  }
+
+  getActive() {
     return this._active;
   }
 
-  #currentPlayerDisplayString() {
-    return `It's player ${this._currentPlayer}'s turn`;
-  }
-
-  onClick(clickedCellEvent) {
-    const clickedCell = clickedCellEvent.target;
-    const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-
+  processAction(clickedCellIndex) {
     if (!this._active || this._state[clickedCellIndex] !== "") {
-      return;
+      return false;
     }
-
-    this.processClick(clickedCell, clickedCellIndex);
-    this.checkResult();
-    this.switchPlayer();
-  }
-
-  processClick(clickedCell, clickedCellIndex) {
     this._state[clickedCellIndex] = this._currentPlayer;
-    clickedCell.innerHTML = this._currentPlayer;
   }
 
   checkResult() {
@@ -68,36 +51,27 @@ class Game {
     }
 
     if (roundWon) {
-      this._statusDisplay.innerHTML = `Player ${this._currentPlayer} has won!`;
-      this._statusDisplay.classList.add('player-won');
       this._active = false;
-      return;
+      return { winner: this._currentPlayer, status: "won"}
     }
 
     let roundDraw = !this._state.includes("");
     if (roundDraw) {
-      this._statusDisplay.innerHTML = "It's a draw!";
-      this._statusDisplay.classList.add('player-draw');
       this._active = false;
-      return;
+      return { winner: null, status: "draw" }
     }
 
-    this.switchPlayer();
+    return { winner: null, status: "active" }
   }
 
   switchPlayer() {
     this._currentPlayer = this._currentPlayer === "X" ? "O" : "X";
-    this._statusDisplay.innerHTML = this.#currentPlayerDisplayString();
   }
 
   reset() {
     this._active = true;
     this._currentPlayer = "X";
     this._state = ["", "", "", "", "", "", "", "", ""];
-    this._statusDisplay.innerHTML = this.#currentPlayerDisplayString();
-    this._statusDisplay.classList.remove('player-won');
-    this._statusDisplay.classList.remove('player-draw');
-    this._cells.forEach(cell => cell.innerHTML = "");
   }
 }
 

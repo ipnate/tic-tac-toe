@@ -1,61 +1,170 @@
 import { expect, test, describe, vi, beforeEach } from "vitest";
 import Game from "../src/Game";
-import { JSDOM } from "jsdom";
 
-describe("checkResult", () => {
-  beforeEach(() => {
-    const dom = new JSDOM(
-      `<!DOCTYPE html>
-        <body>
-          <div class="container">
-            <h1>Tic Tac Toe</h1>
-            <div class="details">
-              <span class="detail status"></span>
-              <button class="detail reset reset-button">Reset Game</button>
-            </div>
-          <div class="game-board">
-            <div data-index="0" class="cell"></div>
-            <div data-index="2" class="cell"></div>
-            <div data-index="1" class="cell"></div>
-            <div data-index="4" class="cell"></div>
-            <div data-index="3" class="cell"></div>
-            <div data-index="6" class="cell"></div>
-            <div data-index="5" class="cell"></div>
-            <div data-index="8" class="cell"></div>
-            <div data-index="7" class="cell"></div>
-          </div>
-        </div>
-      </body>`
-    );
+describe("Game", () => {
+  beforeEach(() => {});
 
-    global.document = dom.window.document;
+  test("getCurrentPlayer should return X as the initial player", () => {
+    const game = new Game();
+    expect(game.getCurrentPlayer()).toBe("X");
   });
 
-  test("should display player has won message when a winning condition is met", () => {
-    const initialState = ["X", "O", "X", "X", "", "", "X", "", ""];
-    const initialPlayer = "X";
+  test("getCurrentPlayer should return O if the previous player was X and switchPlayer is called", () => {
+    const game = new Game();
+    game.switchPlayer();
 
-    const game = new Game(document, initialPlayer, initialState);
-    game.checkResult();
-
-    const statusDisplay = document.querySelector(".status");
-    expect(statusDisplay.innerHTML).toBe("Player X has won!");
-    expect(Array.from(statusDisplay.classList)).toContain("player-won");
-
-    expect(game.getGameStatus()).toBe(false);
+    expect(game.getCurrentPlayer()).toBe("O");
   });
 
-  test("should display draw message when all cells are filled and no winning condition is met", () => {
-    const initialState = ["X", "O", "X", "O", "X", "O", "O", "X", "O"];
-    const initialPlayer = "X";
-    
-    const game = new Game(document, initialPlayer, initialState);
-    game.checkResult();
+  test("processAction should return false if the game is not completed", () => {
+    const game = new Game();
+    game.processAction(0);
+    game.processAction(1);
+    game.processAction(2);
 
-    const statusDisplay = document.querySelector(".status");
-    expect(statusDisplay.innerHTML).toBe("It's a draw!");
-    expect(Array.from(statusDisplay.classList)).toContain("player-draw");
+    const gameResult = game.checkResult();
+    expect(gameResult.status).toBe("won");
+    expect(game.processAction(3)).toBe(false);
+  });
+
+  test("processAction should return false if the cell is already played", () => {
+    const game = new Game();
+    game.processAction(0);
+
+    expect(game.processAction(0)).toBe(false);
+  });
+
+  test("processAction should set the cell to the current player", () => {
+    const game = new Game();
+    game.processAction(0);
+
+    expect(game.getState()).toEqual(["X", "", "", "", "", "", "", "", ""]);
+  });
+
+  test("checkResult should return won if the current player has won", () => {
+    const game = new Game();
+    game.processAction(0); // X
+    game.switchPlayer();
+    game.processAction(3); // O
+    game.switchPlayer();
+    game.processAction(1); // X
+    game.switchPlayer();
+    game.processAction(4); // O
+    game.switchPlayer();
+    game.processAction(2); // X
+
+    const gameResult = game.checkResult();
+    expect(gameResult.status).toBe("won");
+    expect(gameResult.winner).toBe("X");
+  });
+
+  test("checkResult should return draw if the game is a draw", () => {
+    const game = new Game();
+    game.processAction(0); // X
+    game.switchPlayer();
+    game.processAction(1); // O
+    game.switchPlayer();
+    game.processAction(2); // X
+    game.switchPlayer();
+    game.processAction(3); // O
+    game.switchPlayer();
+    game.processAction(5); // X
+    game.switchPlayer();
+    game.processAction(4); // O
+    game.switchPlayer();
+    game.processAction(6); // X
+    game.switchPlayer();
+    game.processAction(8); // O
+    game.switchPlayer();
+    game.processAction(7); // X
+
+    const gameResult = game.checkResult();
+    expect(gameResult.status).toBe("draw");
+    expect(gameResult.winner).toBe(null);
+  });
+
+  test("checkResult should return active if the game is still active", () => {
+    const game = new Game();
+    game.processAction(0); // X
+    game.switchPlayer();
+    game.processAction(1); // O
+    game.switchPlayer();
+    game.processAction(2); // X
+    game.switchPlayer();
+    game.processAction(3); // O
+    game.switchPlayer();
+    game.processAction(5); // X
+    game.switchPlayer();
+    game.processAction(4); // O
+
+    const gameResult = game.checkResult();
+    expect(gameResult.status).toBe("active");
+    expect(gameResult.winner).toBe(null);
+  });
+
+  test("switchPlayer should switch the player from X to O", () => {
+    const game = new Game();
+    expect(game.getCurrentPlayer()).toBe("X");
     
-    expect(game.getGameStatus()).toBe(false);
+    game.switchPlayer();
+    expect(game.getCurrentPlayer()).toBe("O");
+  });
+
+  test("switchPlayer should switch the player from O to X", () => {
+    const game = new Game();
+    expect(game.getCurrentPlayer()).toBe("X");
+
+    game.switchPlayer(); // O
+    expect(game.getCurrentPlayer()).toBe("O");
+
+    game.switchPlayer(); // X
+    expect(game.getCurrentPlayer()).toBe("X");
+  });
+
+  test("reset should reset the game state", () => {
+    const game = new Game();
+    game.processAction(0); // X
+    game.switchPlayer();
+    game.processAction(1); // O
+    game.switchPlayer();
+    game.processAction(2); // X
+    game.switchPlayer();
+    game.processAction(3); // O
+    game.switchPlayer();
+    game.processAction(4); // X
+    game.switchPlayer();
+    game.processAction(5); // O
+    expect(game.getState()).toEqual(["X", "O", "X", "O", "X", "O", "", "", ""]);
+
+    game.reset();
+    expect(game.getState()).toEqual(["", "", "", "", "", "", "", "", ""]);
+  });
+
+  test("reset should set the current player to X", () => {
+    const game = new Game();
+    game.switchPlayer();
+    expect(game.getCurrentPlayer()).toBe("O");
+
+    game.reset();
+    expect(game.getCurrentPlayer()).toBe("X");
+  });
+
+  test("reset should set the game to active", () => {
+    const game = new Game();
+    game.processAction(0); // X
+    game.switchPlayer();
+    game.processAction(3); // O
+    game.switchPlayer();
+    game.processAction(1); // X
+    game.switchPlayer();
+    game.processAction(4); // O
+    game.switchPlayer();
+    game.processAction(2); // X
+    
+    game.checkResult();
+    expect(game.getActive()).toBe(false);
+
+    game.reset();
+    expect(game.getActive()).toBe(true);
   });
 });
