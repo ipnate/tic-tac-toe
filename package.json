@@ -8,7 +8,7 @@
     "start": "webpack serve",
     "build": "webpack",
     "test:vi:run": "vitest run Game.test.js",
-    "test:pw:ci": "playwright install --with-deps", 
+    "test:pw:ci": "playwright install --with-deps",
     "test:pw:run:project": "playwright test --project",
     "test:pw:run:all": "playwright test --project all",
     "test:pw:run:chromium": "playwright test --project chromium",
@@ -19,6 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "css-loader": "^7.1.1",
+    "date-fns": "^3.6.0",
     "html-webpack-plugin": "^5.6.0",
     "jsdom": "^24.0.0",
     "playwright": "^1.43.1",
