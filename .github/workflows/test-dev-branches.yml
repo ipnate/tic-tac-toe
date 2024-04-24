@@ -1,19 +1,19 @@
-name: Build, Tests, and Deploy
+name: Run Tests on Development Branches
 
 on:
   push:
-    branches:
+    branches-ignore:
       - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
   workflow_dispatch:
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 jobs:
   unit-tests:
+    if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -33,6 +33,7 @@ jobs:
       - name: Run Vitest tests
         run: pnpm test:vi:run
   end-to-end-tests:
+    if: github.event_name != 'pull_request' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -78,36 +79,4 @@ jobs:
           name: playwright-report-${{ env.BROWSER_NAME }}-${{ env.TIMESTAMP }}
           path: playwright-report/
           retention-days: 30
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.20.2' 
-      - run: npm install -g pnpm@8
-      - name: Create pnpm store directory
-        run: mkdir -p ~/.pnpm-store
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.pnpm-store 
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build
-        run: pnpm build
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
 
