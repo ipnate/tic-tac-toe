@@ -5,10 +5,6 @@ const config = {
     headless: true,
     viewport: { width: 1280, height: 720 },
   },
-  matrix: {
-    browser: ['chromium', 'firefox', 'webkit'],
-    viewport: [{ width: 800, height: 600 }, { width: 1200, height: 768 }],
-  },
   projects: [
     {
       name: 'Chromium',
