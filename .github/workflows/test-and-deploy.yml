@@ -13,6 +13,30 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.20.2' 
+      - run: npm install -g pnpm@8
+      - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store 
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: ./dist
   unit-tests:
     runs-on: ubuntu-latest
     steps:
@@ -33,6 +57,7 @@ jobs:
       - name: Run Vitest tests
         run: pnpm test:vi:run
   end-to-end-tests:
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -60,8 +85,11 @@ jobs:
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install dependencies
         run: pnpm install
-      - name: Build
-        run: pnpm build
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+          path: ./dist
       - name: Install Playwright browsers
         run: pnpm test:pw:ci
       - name: Run Playwright tests
@@ -79,7 +107,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
   deploy:
-    needs: [unit-tests, end-to-end-tests]
+    needs: [build, unit-tests, end-to-end-tests]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
