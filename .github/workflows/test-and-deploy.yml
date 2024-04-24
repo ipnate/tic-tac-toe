@@ -10,10 +10,27 @@ on:
       - synchronize
       - reopened
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *" # Run every day at midnight (not needed but can be useful if I used a running app instead of a file to test against)
 jobs:
-  test:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.20.2' 
+      - run: npm install -g pnpm@8
+      - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store 
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run Vitest tests
+        run: pnpm test:vi:run
+  end-to-end-tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
