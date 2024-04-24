@@ -126,6 +126,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   cleanup-if-failure:
+    needs: [unit-tests, end-to-end-tests]
     if: failure()
     runs-on: ubuntu-latest
     steps:
