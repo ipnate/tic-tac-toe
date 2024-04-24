@@ -1,5 +1,3 @@
-import { format } from 'date-fns';
-
 const config = {
   workers: 4,
   testDir: "tests/end-to-end",
