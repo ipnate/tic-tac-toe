@@ -1,17 +1,17 @@
 name: Run Playwright Tests
 
-on: 
+on:
   push:
     branches:
       - master
   pull_request:
-    types: 
+    types:
       - opened
       - synchronize
       - reopened
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *' # Run every day at midnight
+    - cron: "0 0 * * *" # Run every day at midnight (not needed but can be useful if I used a running app instead of a file to test against)
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -22,17 +22,17 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.20.2' 
+          node-version: "16.20.2"
       - run: npm install -g pnpm@8
       - name: Get current date
         id: date
         run: echo "date=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
       - name: Create pnpm store directory
         run: mkdir -p ~/.pnpm-store
-      - name: Cache dependencies 
+      - name: Cache dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.pnpm-store 
+          path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Cache Playwright dependencies
         uses: actions/cache@v3

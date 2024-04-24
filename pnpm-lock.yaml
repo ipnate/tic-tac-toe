@@ -8,9 +8,6 @@ devDependencies:
   css-loader:
     specifier: ^7.1.1
     version: 7.1.1(webpack@5.91.0)
-  date-fns:
-    specifier: ^3.6.0
-    version: 3.6.0
   html-webpack-plugin:
     specifier: ^5.6.0
     version: 5.6.0(webpack@5.91.0)
@@ -1254,10 +1251,6 @@ packages:
     dependencies:
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.0.0
-    dev: true
-
-  /date-fns@3.6.0:
-    resolution: {integrity: sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww==}
     dev: true
 
   /debug@2.6.9:
