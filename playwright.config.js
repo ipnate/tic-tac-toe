@@ -1,6 +1,7 @@
 const config = {
   workers: 4,
   testDir: 'tests/end-to-end',
+  reporter: process.env.CI ? [['html', { open: 'never' }]] : 'list',
   use: {
     headless: true,
     viewport: { width: 1280, height: 720 },

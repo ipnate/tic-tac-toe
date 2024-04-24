@@ -44,3 +44,9 @@ jobs:
         run: pnpm test:pw:ci
       - name: Run Playwright tests
         run: pnpm test:pw:run:project ${{ matrix.browser }}
+      - uses: actions/upload-artifact@v3
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
