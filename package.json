@@ -8,9 +8,9 @@
     "start": "webpack serve",
     "build": "webpack",
     "test:vi:run": "vitest run Game.test.js",
-    "test:pw:build": "webpack",
     "test:pw:prepare": "playwright install", 
     "test:pw:run": "playwright test",
+    "test:pw:run:all": "playwright test --browser all",
     "test:pw:run:ch": "playwright test --browser chromium",
     "test:pw:run:ff": "playwright test --browser firefox",
     "test:pw:run:wk": "playwright test --browser webkit"
