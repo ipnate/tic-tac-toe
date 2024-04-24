@@ -25,6 +25,6 @@ test.describe("index.html", () => {
 
     const statusDisplay = await page.$(".status");
     const statusText = await statusDisplay.innerText();
-    expect(statusText).toBe("It's a draw!");
+    expect(statusText).toBe("It's a drawsss!");
   });
 });
