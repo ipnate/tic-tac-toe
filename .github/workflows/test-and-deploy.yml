@@ -121,17 +121,11 @@ jobs:
         with:
           node-version: '16.20.2' 
       - run: npm install -g pnpm@8
-      - name: Create pnpm store directory
-        run: mkdir -p ~/.pnpm-store
-      - name: Cache dependencies
-        uses: actions/cache@v3
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
         with:
-          path: ~/.pnpm-store 
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-      - name: Install dependencies
-        run: pnpm install
-      - name: Build
-        run: pnpm build
+          name: build
+          path: ./dist
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
