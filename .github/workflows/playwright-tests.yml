@@ -24,6 +24,8 @@ jobs:
         with:
           node-version: '16.20.2' 
       - run: npm install -g pnpm@8
+      - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
       - name: Cache dependencies 
         uses: actions/cache@v3
         with:
@@ -36,4 +38,4 @@ jobs:
       - name: Prepare Playwright
         run: pnpm test:pw:prepare
       - name: Run Playwright tests
-        run: pnpm test:pw:run --browser ${{ matrix.browser }}
+        run: pnpm test:pw:run --project ${{ matrix.browser }}
