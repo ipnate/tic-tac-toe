@@ -5,8 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "http-server -c-1 -o -a localhost -p 8000",
-    "test": "vitest"
+    "start": "webpack serve",
+    "build": "webpack",
+    "test:vi:run": "vitest run Game.test.js",
+    "test:pw:build": "webpack",
+    "test:pw:prepare": "playwright install", 
+    "test:pw:run": "playwright test",
+    "test:pw:run:ch": "playwright test --browser chromium",
+    "test:pw:run:ff": "playwright test --browser firefox",
+    "test:pw:run:wk": "playwright test --browser webkit"
   },
   "author": "Ignatius (Nate) Du Preez",
   "license": "ISC",
@@ -14,6 +21,7 @@
     "css-loader": "^7.1.1",
     "html-webpack-plugin": "^5.6.0",
     "jsdom": "^24.0.0",
+    "playwright": "^1.43.1",
     "style-loader": "^4.0.0",
     "vitest": "0.34.6",
     "webpack": "^5.91.0",

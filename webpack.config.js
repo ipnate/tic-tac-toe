@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const config = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.js', 
   output: {
     filename: 'bundle.js',
@@ -24,11 +24,12 @@ const config = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html', 
+      inject: 'body',
     }),
   ],
   devServer: {
     static: './dist',
-    hot: true 
+    hot: true,
   },
 };
 

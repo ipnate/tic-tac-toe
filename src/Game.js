@@ -32,6 +32,7 @@ class Game {
       return false;
     }
     this._state[clickedCellIndex] = this._currentPlayer;
+    return true;
   }
 
   checkResult() {

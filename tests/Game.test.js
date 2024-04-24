@@ -34,6 +34,11 @@ describe("Game", () => {
     expect(game.processAction(0)).toBe(false);
   });
 
+  test("processAction should return true if the cell is played successfully", () => {
+    const game = new Game();
+    expect(game.processAction(0)).toBe(true);
+  });
+
   test("processAction should set the cell to the current player", () => {
     const game = new Game();
     game.processAction(0);
