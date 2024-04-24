@@ -79,6 +79,7 @@ jobs:
           path: playwright-report/
           retention-days: 30
   deploy:
+    needs: [unit-tests, end-to-end-tests]
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
