@@ -18,6 +18,8 @@ jobs:
     strategy:
       matrix:
         browser: [chromium, firefox, webkit]
+    env:
+      BROWSER_NAME: ${{ matrix.browser }} 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -47,6 +49,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-${{ env.BROWSER_NAME }}
           path: playwright-report/
           retention-days: 30

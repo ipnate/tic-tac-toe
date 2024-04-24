@@ -1,7 +1,7 @@
 const config = {
   workers: 4,
   testDir: 'tests/end-to-end',
-  reporter: process.env.CI ? [['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI ? [['html', { open: 'never', outputFile: `playwright-report-${process.env.BROWSER_NAME}.html` }]] : 'list',
   use: {
     headless: true,
     viewport: { width: 1280, height: 720 },
