@@ -19,7 +19,8 @@ jobs:
       matrix:
         browser: [chromium, firefox, webkit]
     env:
-      BROWSER_NAME: ${{ matrix.browser }} 
+      BROWSER_NAME: ${{ matrix.browser }}
+      TIMESTAMP: ${{ format(github.event.inputs.scheduled_time, 'yyyyMMdd-HHmmss') }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -49,6 +50,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-${{ env.BROWSER_NAME }}
+          name: playwright-report-${{ env.BROWSER_NAME }}-${{ env.TIMESTAMP }}
           path: playwright-report/
           retention-days: 30
