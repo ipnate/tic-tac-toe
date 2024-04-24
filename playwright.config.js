@@ -9,7 +9,7 @@ const config = {
           "html",
           {
             open: "never",
-            outputFile: `playwright-report-${process.env.BROWSER_NAME}-${format(new Date(), 'yyyyMMdd-HHmmss')}.html`,
+            outputFile: `playwright-report-${process.env.BROWSER_NAME}-${process.env.TIMESTAMP}.html`,
           },
         ],
       ]
