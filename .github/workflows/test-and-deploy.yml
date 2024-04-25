@@ -1,9 +1,23 @@
 name: Build, Tests, and Deploy
-
+#TODO: run when merged to master
+#TODO: test PR's and dev branches
+#TODO: add badge to readme
+#TODO: favicon
+#TODO: test responsiveness
+#TODO: upgrade actions to newest versions
+#TODO: review packages, requirements, and scripts
+#TODO: lookup more details that should be included in my index.html
+#TODO: README.MD
 on:
   push:
     branches:
       - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,29 +30,37 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.20.2' 
       - run: npm install -g pnpm@8
       - name: Create pnpm store directory
         run: mkdir -p ~/.pnpm-store
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install dependencies
         run: pnpm install
+      - name: Cache Playwright dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install Playwright browsers
+        run: pnpm test:pw:ci
       - name: Build
         run: pnpm build
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: ./dist
           retention-days: 7
-      - name: Upload artifact
+      - name: Upload github pages artifact
+        if: ${{ github.ref == 'refs/heads/master' }}
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
@@ -46,20 +68,16 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '16.20.2' 
       - run: npm install -g pnpm@8
-      - name: Create pnpm store directory
-        run: mkdir -p ~/.pnpm-store
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-      - name: Install dependencies
-        run: pnpm install
       - name: Run Vitest tests
         run: pnpm test:vi:run
   end-to-end-tests:
@@ -69,8 +87,8 @@ jobs:
       matrix:
         browser: [chromium, firefox, webkit]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "16.20.2"
       - run: npm install -g pnpm@8
@@ -78,32 +96,26 @@ jobs:
         id: date
         run: echo "date=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
       - name: Create pnpm store directory
-        run: mkdir -p ~/.pnpm-store
-      - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Cache Playwright dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-      - name: Install dependencies
-        run: pnpm install
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: ./dist
-      - name: Install Playwright browsers
-        run: pnpm test:pw:ci
       - name: Run Playwright tests
         run: pnpm test:pw:run:project ${{ matrix.browser }}
         env:
           BROWSER_NAME: ${{ matrix.browser }}
           TIMESTAMP: ${{ format(steps.date.outputs.date, 'yyyyMMdd-HHmmss') }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         env:
           BROWSER_NAME: ${{ matrix.browser }}
           TIMESTAMP: ${{ format(steps.date.outputs.date, 'yyyyMMdd-HHmmss') }}
@@ -114,13 +126,14 @@ jobs:
           retention-days: 7
   deploy:
     needs: [build, unit-tests, end-to-end-tests]
+    if: ${{ github.ref == 'refs/heads/master' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Setup Pages
-        uses: actions/configure-pages@v3
+        uses: actions/configure-pages@v4
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
