@@ -98,7 +98,55 @@ If there is a need to see the test running in headed mode you can add the `--hea
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. The default branch is master, it is a protected branch. You can branch of it and submit a Pull Request.
+
+If you create a Pull Request the CI Pipline will kick off the Github Actions Workflow and run the Build, Unit Tests and End to end tests. All these test are required to pass before being able to merge into master.
+
+A contributor also needs to approve your changes before it can be merged into master.
+
+After the pull request is merged to master the CI/CD Pipline will kick off again and complete the entire workflow which consists off running the Build, Unit Tests, End to end tests and deploying the build to github pages under http://ipnate.github.io/tic-tac-toe.
+
+## Build Pipline
+
+The project makes use of Github Actions for its CI/CD pipline.
+
+There are 4 shared workflows that combine into a build, test and deploy workflow. They all run on `Ubuntu` workers with `Node v16`
+
+Retention for all artifacts are set to 7 days.
+
+#### Build
+- Installs `pnpm@8`.
+- Installs all the dependencies using `pnpm@8`.
+- Caches all the dependencies.
+- Install all the `Playwright` browsers.
+- Caches all the `Playwright` browsers.
+- Builds the production build using `Webpack`.
+- Uploads the build artifact to be used later.
+- Uploads the build artifact to be deployed to `Github Pages` later.
+
+#### Unit Tests
+- Installs `pnpm@8`
+- Checks the cache for the dependencies.
+- If it couldn't find a cache it installs the dependencies using `pnpm@8`
+- Runs the `Vitest` unit tests.
+
+#### End to End Tests
+This part spins up 3 jobs, one for each of the browsers: `Chromium`, `Firefox`, and `Webkit`
+
+- Installs `pnpm@8`
+- Checks the cache for the dependencies.
+- If it couldn't find a cache it installs the dependencies using `pnpm@8`
+- Checks the cache for the `Playwright` browsers.
+- If it couldn't find the cache, it installs the `Playwright` browsers. If it is the `Webkit` job, it always install the dependencies again because webkit requires other file system dependencies that can't be cached.
+- Downloads the Build artifact created in the Build step.
+- Runs the `Playwright` tests agains the Build.
+- Uploads the `playwright-report` artifact for inspection by developer.
+
+#### Deploy
+- If the branch is master it will proceed.
+- Configures `Github Pages`.
+- Deploys the artifact that was uploaded in the build step to `Github Pages`.
+- Outputs the page url.
 
 ## License
 
