@@ -1,3 +1,3 @@
 # tic-tac-toe
 
-![Workflow Badge](https://img.shields.io/github/workflow/status/ipnate/tic-tac-toe/build-test-deploy.yml?branch=master)
+![Workflow Badge](https://github.com/ipnate/tic-tac-toe/actions/workflows/build-test-deploy.yml/badge.svg)
