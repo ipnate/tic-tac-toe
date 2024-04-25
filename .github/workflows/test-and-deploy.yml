@@ -37,14 +37,19 @@ jobs:
       - run: npm install -g pnpm@8
       - name: Create pnpm store directory
         run: mkdir -p ~/.pnpm-store
-      - name: Cache dependencies
+      - name: Cache dependencies #Cache pnpm store here so the subsequent steps will install faster
+        id: cache-pnpm
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - if: ${{ steps.cache-pnpm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
       - name: Install dependencies
         run: pnpm install
-      - name: Cache Playwright dependencies
+      - name: Cache Playwright dependencies #Cache Playwright browsers here so the subsequent steps will install faster
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -74,11 +79,20 @@ jobs:
         with:
           node-version: '16.20.2' 
       - run: npm install -g pnpm@8
+      - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
       - name: Cache dependencies
+        id: cache-pnpm
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - if: ${{ steps.cache-pnpm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+      - name: Install dependencies
+        run: pnpm install
       - name: Run Vitest tests
         run: pnpm test:vi:run
   end-to-end-tests:
@@ -97,15 +111,26 @@ jobs:
         id: date
         run: echo "date=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
       - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
+      - name: Cache dependencies
+        id: cache-pnpm
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - if: ${{ steps.cache-pnpm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: pnpm list
+      - name: Install dependencies
+        run: pnpm install
       - name: Cache Playwright dependencies
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install Playwright browsers
+        run: pnpm test:pw:ci
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
