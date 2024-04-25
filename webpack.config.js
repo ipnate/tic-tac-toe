@@ -25,7 +25,8 @@ const config = {
     new HtmlWebpackPlugin({
       template: './src/index.html', 
       inject: 'body',
-    }),
+      favicon: './src/favicon.png'
+    })
   ],
   devServer: {
     static: './dist',
