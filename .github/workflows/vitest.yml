@@ -1,0 +1,29 @@
+name: Reusable Vitest Workflow
+
+on:
+  workflow_call:
+jobs:
+  vitest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '16.20.2' 
+      - run: npm install -g pnpm@8
+      - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
+      - name: Cache dependencies
+        id: cache-pnpm
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store 
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - if: ${{ steps.cache-pnpm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run Vitest tests
+        run: pnpm test:vi:run

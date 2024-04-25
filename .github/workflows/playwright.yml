@@ -1,0 +1,63 @@
+name: Reusable Playwright Workflow
+
+on:
+  workflow_call:
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "16.20.2"
+      - run: npm install -g pnpm@8
+      - name: Get current date
+        id: date
+        run: echo "date=$(date '+%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+      - name: Create pnpm store directory
+        run: mkdir -p ~/.pnpm-store
+      - name: Cache dependencies
+        id: cache-pnpm
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - if: ${{ steps.cache-pnpm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: pnpm list
+      - name: Install dependencies
+        run: pnpm install
+      - name: Cache Playwright dependencies
+        uses: actions/cache@v4
+        id: cache-playwright
+        with:
+          path: | 
+            ~/.cache/ms-playwright
+            ~/.cache/ms-playwright-webkit-binaries
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - if: ${{ matrix.browser == 'webkit' || steps.cache-playwright.outputs.cache-hit != 'true' }}
+        name: Install Playwright browsers
+        run: pnpm test:pw:ci
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./dist
+      - name: Run Playwright tests
+        run: pnpm test:pw:run:project ${{ matrix.browser }}
+        env:
+          BROWSER_NAME: ${{ matrix.browser }}
+          TIMESTAMP: ${{ format(steps.date.outputs.date, 'yyyyMMdd-HHmmss') }}
+      - uses: actions/upload-artifact@v4
+        env:
+          BROWSER_NAME: ${{ matrix.browser }}
+          TIMESTAMP: ${{ format(steps.date.outputs.date, 'yyyyMMdd-HHmmss') }}
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ env.BROWSER_NAME }}-${{ env.TIMESTAMP }}
+          path: playwright-report/
+          retention-days: 7

@@ -1,0 +1,39 @@
+name: Build, Tests, and Deploy
+#TODO: run when merged to master
+#TODO: test PR's and dev branches
+#TODO: add badge to readme
+#TODO: favicon
+#TODO: test responsiveness
+#TODO: review packages, requirements, and scripts
+#TODO: lookup more details that should be included in my index.html
+#TODO: README.MD
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+  unit-tests:
+    needs: build
+    uses: ./.github/workflows/vitest.yml
+  end-to-end-tests:
+    needs: build
+    uses: ./.github/workflows/playwright.yml
+  deploy:
+    needs: [build, unit-tests, end-to-end-tests]
+    uses: ./.github/workflows/deploy.yml
