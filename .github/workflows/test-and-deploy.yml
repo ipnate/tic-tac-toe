@@ -78,6 +78,8 @@ jobs:
         with:
           path: ~/.pnpm-store 
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install #doesn't download anything if the build step was successful,just the setups the PATH
       - name: Run Vitest tests
         run: pnpm test:vi:run
   end-to-end-tests:
@@ -100,6 +102,8 @@ jobs:
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install dependencies
+        run: pnpm install #doesn't download anything if the build step was successful,just the setups the PATH
       - name: Cache Playwright dependencies
         uses: actions/cache@v4
         with:
